@@ -4097,10 +4097,20 @@ export class Game extends GameCompatible {
 			}
 			window.location.reload();
 		}
-		//非ios的网页版
-		else if (!ios) {
+		//非ios的网页版; PWA
+		else {
 			window.onbeforeunload = null;
-			window.close();
+			if (window.isAndroidApp) {
+				window.close();
+				window.onpopstate = null;
+				window.history.back();
+				window.location.replace('assets/exit-android.html');
+			} else if (window.isIOSApp) {
+				window.location.replace('assets/exit-ios.html');
+			} else {
+				window.onbeforeunload = null;
+				window.close();
+			}
 		}
 	}
 	/**
