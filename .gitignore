@@ -4,6 +4,7 @@ image/*.TXT
 !extension/cardpile
 !extension/coin
 !extension/wuxing
+!extension/decade_ui
 !node_modules/@types
 !node_modules/noname-typings
 !node_modules/options
