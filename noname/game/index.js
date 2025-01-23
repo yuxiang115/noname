@@ -1428,37 +1428,58 @@ export class Game extends GameCompatible {
 	requireSandboxOn(ip = "") {
 		security.requireSandboxOn(ip);
 	}
+
 	/**
 	 * @param { string } ip
 	 * @param { (result: boolean) => any } callback
 	 */
 	connect(ip, callback) {
 		if (game.online) return;
-		let withport = false;
+
+		// 判断是否是 IP 的正则
+		const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+
+		let withPort = false;
 		let index = ip.lastIndexOf(":");
-		if (index != -1) {
-			index = parseFloat(ip.slice(index + 1));
-			if (index && Math.floor(index) == index) {
-				withport = true;
+		if (index !== -1) {
+			// 检查是否有端口号
+			const port = parseFloat(ip.slice(index + 1));
+			if (port && Math.floor(port) === port) {
+				withPort = true;
 			}
 		}
-		if (!withport) ip = ip + ":8080";
+
+		// 如果是 IP 且没有端口号，添加默认端口
+		if (ipRegex.test(ip) && !withPort) {
+			ip = ip + ":8080";
+		}
+
+		// 如果是域名，且没有以 `/ws/` 结尾，添加 `/ws/`
+		if (!ipRegex.test(ip) && !ip.endsWith("/ws/")) {
+			ip = ip + "/ws/";
+		}
+
 		_status.connectCallback = callback;
+
 		try {
 			if (game.ws) {
 				game.ws._nocallback = true;
 				game.ws.close();
 				delete game.ws;
 			}
+
 			let str = "";
-			if (!ip.startsWith("wss://") && !ip.startsWith("ws://")) str = get.config("wss_mode", "connect") ? "wss://" : "ws://";
-			game.ws = new WebSocket(str + ip + "");
+			if (!ip.startsWith("wss://") && !ip.startsWith("ws://")) {
+				str = get.config("wss_mode", "connect") ? "wss://" : "ws://";
+			}
+
+			game.ws = new WebSocket(str + ip);
 		} catch {
-			// 今天狂神龙尊来了这里也没有参数
 			alert("错误：无效联机地址");
 			if (callback) callback(false);
 			return;
 		}
+
 		game.sandbox = security.createSandbox();
 		game.ws.onopen = lib.element.ws.onopen;
 		game.ws.onmessage = lib.element.ws.onmessage;
