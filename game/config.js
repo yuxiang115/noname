@@ -74,11 +74,11 @@ window.config = {
 	alteredSkills: [],
 	brokenFile: [],
 
-	theme: "woodden",
+	theme: "simple",
 	layout: "mobile",
-	card_style: "default",
+	card_style: "simple",
 	cardback_style: "default",
-	hp_style: "default",
+	hp_style: "ol",
 
 	image_character: "default",
 	image_background: "default",
